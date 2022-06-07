@@ -9,10 +9,10 @@
  */
 enum PWM
 {
-    P1 = 12,
-    P2 = 13,
-    P3 = 14,
-    P4 = 15
+    PWM1 = 12,
+    PWM2 = 13,
+    PWM3 = 14,
+    PWM4 = 15
 }
 //% weight=5 color=#0fbc11 icon="\uf113"
 namespace Servo {
