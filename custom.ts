@@ -229,7 +229,7 @@ let LCD_CS = DigitalPin.P9;
 let LCD_BL = 7;
 
 //% weight=20 color=#436EEE icon="\uf108"
-namespace LCD1IN8 {
+namespace LCD {
     //% blockId=LCD_Init
     //% blockGap=8
     //% block="LCD1IN8 Init"
@@ -671,12 +671,12 @@ enum KEY {
 };
 
 //% weight=20 color=#3333ff icon="\uf11b"
-namespace SimpleShieldKey {
+namespace Key {
     let KEYSCAN = 0;
-    //% blockID==Listen_Key
-    //% block="Listen_Key"
+    //% blockID==KeyScan
+    //% block="KeyScan"
     //% weight=90
-    export function Read74HC165(): void {
+    export function KeyScan(): void {
         pins.setPull(INSR0_DATA, PinPullMode.PullUp)
         Servo.FullOff(INSR_LATCH);
         control.waitMicros(20000);
@@ -692,13 +692,12 @@ namespace SimpleShieldKey {
             control.waitMicros(1000);
             pins.digitalWritePin(SR_CLK, 1);
         }
-        //basic.showNumber(KEYSCAN);
     }
 
-    //% blockID==Listen_Key
+    //% blockID==ReadKey
     //% block="Key %pin |Press"
     //% weight=90
-    export function Listen_Key(pin: KEY): boolean {
+    export function ReadKey(pin: KEY): boolean {
         let res = (KEYSCAN >> pin) & 0x01;
         if (res == 1) {
             return false;
