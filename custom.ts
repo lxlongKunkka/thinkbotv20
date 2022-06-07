@@ -3,7 +3,6 @@
  * 使用此文件来定义自定义函数和图形块。
  * 想了解更详细的信息，请前往 https://makecode.microbit.org/blocks/custom
  */
-
 /**
  * 自定义图形块
  */
@@ -707,3 +706,98 @@ namespace KeyPad {
     }
 }
 
+enum Motors {
+    //% block="M1"
+    M1 = 0x1,
+    //% block="M2"
+    M2 = 0x2,
+}
+//% weight=20 color=#3333ff icon="\uf113"
+namespace Motor {
+
+    //% blockId=Motor block="Motor|%index|speed %speed"
+    //% speed eg: 150
+    //% weight=100
+    //% speed.min=-255 speed.max=255
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    export function MotorRun(index: Motors, speed: number): void {
+        speed = speed * 16; // map 255 to 4096
+        if (speed >= 4096) {
+            speed = 4095
+        }
+        if (speed <= -4096) {
+            speed = -4095
+        }
+        if (index == 1) {
+            if (speed >= 0) {
+                Servo.setPwm(2, 0, 4095)
+                Servo.setPwm(3, 0, 0)
+                Servo.setPwm(1, 0, speed)
+            } else {
+                Servo.setPwm(2, 0, 0)
+                Servo.setPwm(3, 0, 4095)
+                Servo.setPwm(1, 0, -speed)
+            }
+        } else if (index == 2) {
+            if (speed >= 0) {
+                Servo.setPwm(5, 0, 4095)
+                Servo.setPwm(4, 0, 0)
+                Servo.setPwm(6, 0, speed)
+            } else {
+                Servo.setPwm(5, 0, 0)
+                Servo.setPwm(4, 0, 4095)
+                Servo.setPwm(6, 0, -speed)
+            }
+        }
+    }
+    //% blockId=Motor block="Motor Stop"
+    //% weight=100
+    export function stop() {
+        Motor.MotorRun(Motors.M1, 0)
+        Motor.MotorRun(Motors.M2, 0)
+    }
+    //% blockId=Motor block="Forward|speed %speed |interval %interval"
+    //% speed eg: 150
+    //% weight=100
+    //% speed.min=-255 speed.max=255
+    //% interval eg: 100
+    export function forward(speed: number, interval: number) {
+        Motor.MotorRun(Motors.M1, speed)
+        Motor.MotorRun(Motors.M2, speed)
+        basic.pause(interval)
+        stop()
+    }
+    //% blockId=Motor block="Back|speed %speed |interval %interval"
+    //% speed eg: 150
+    //% weight=100
+    //% speed.min=-255 speed.max=255
+    //% interval eg: 100
+    export function back(speed: number, interval: number) {
+        Motor.MotorRun(Motors.M1, -speed)
+        Motor.MotorRun(Motors.M2, -speed)
+        basic.pause(interval)
+        stop()
+    }
+    //% blockId=Motor block="Left|speed %speed |interval %interval"
+    //% speed eg: 150
+    //% weight=100
+    //% speed.min=-255 speed.max=255
+    //% interval eg: 100
+    export function left(speed: number, interval: number) {
+        Motor.MotorRun(Motors.M1, speed)
+        Motor.MotorRun(Motors.M2, -speed)
+        basic.pause(interval)
+        stop()
+    }
+    //% blockId=Motor block="Right|speed %speed |interval %interval"
+    //% speed eg: 150
+    //% weight=100
+    //% speed.min=-255 speed.max=255
+    //% interval eg: 100
+    export function right(speed: number, interval: number) {
+        Motor.MotorRun(Motors.M1, -speed)
+        Motor.MotorRun(Motors.M2, speed)
+        basic.pause(interval)
+        stop()
+    }
+}
