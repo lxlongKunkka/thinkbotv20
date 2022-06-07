@@ -671,15 +671,15 @@ enum KEY {
 };
 
 //% weight=20 color=#3333ff icon="\uf11b"
-namespace Key {
+namespace KeyPad {
     let KEYSCAN = 0;
-    //% blockID==KeyScan
+    //% blockID==KeyPad
     //% block="KeyScan"
     //% weight=90
     export function KeyScan(): void {
         pins.setPull(INSR0_DATA, PinPullMode.PullUp)
         Servo.FullOff(INSR_LATCH);
-        control.waitMicros(20000);
+        control.waitMicros(25000);
         Servo.FullOn(INSR_LATCH);
         control.waitMicros(20000);
         KEYSCAN = 0;
@@ -692,9 +692,10 @@ namespace Key {
             control.waitMicros(1000);
             pins.digitalWritePin(SR_CLK, 1);
         }
+        //basic.showNumber(KEYSCAN)
     }
 
-    //% blockID==ReadKey
+    //% blockID==KeyPad
     //% block="Key %pin |Press"
     //% weight=90
     export function ReadKey(pin: KEY): boolean {
