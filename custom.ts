@@ -374,11 +374,9 @@ namespace LCD {
     //写寄存器
     function LCD_WriteReg(reg: number): void {
         pins.digitalWritePin(LCD_DC, 0);
-        Servo.SetLED(1, true);
         pins.digitalWritePin(LCD_CS, 0);
         pins.spiWrite(reg);
         pins.digitalWritePin(LCD_CS, 1);
-        Servo.SetLED(1, false);
     }
 
     //写8位数据
@@ -667,6 +665,8 @@ enum KEY {
     A = 12,
     B = 13,
     MENU = 14,
+    UBIT_A = 15,
+    UBIT_B = 16
 };
 
 //% weight=20 color=#3333ff icon="\uf11b"
@@ -698,7 +698,19 @@ namespace KeyPad {
     //% block="Key %pin |Press"
     //% weight=90
     export function ReadKey(pin: KEY): boolean {
-        let res = (KEYSCAN >> pin) & 0x01;
+        let res
+        if(pin == KEY.UBIT_A)
+        {
+            res = pins.digitalReadPin(DigitalPin.P5)
+        }
+        else if(pin == KEY.UBIT_B)
+        {
+            res = pins.digitalReadPin(DigitalPin.P11)
+        }
+        else
+        {
+            res = (KEYSCAN >> pin) & 0x01;
+        }
         if (res == 1) {
             return false;
         }
@@ -799,5 +811,114 @@ namespace Motor {
         Motor.MotorRun(Motors.M2, speed)
         basic.pause(interval)
         stop()
+    }
+}
+
+// Add your code here
+
+let PCF8591_ADDRESS = 72;
+
+enum AI {
+    A0 = 0,
+    A1,
+    A2,
+    A3,
+    OUT
+}
+
+//% weight=20 color=#3333ff icon="\uf11b"
+namespace Analog {
+    let KEYSCAN = 0;
+    //% blockID==Analog
+    //% block="DAC %val"
+    //% weight=90
+    //% val.min = 0 val.max = 255
+    export function DAC(val: number): void {
+        let buf = pins.createBuffer(2);
+        buf[0] = 64;
+        buf[1] = val;
+        pins.i2cWriteBuffer(PCF8591_ADDRESS, buf);
+    }
+
+    //% blockID==Analog
+    //% block="ADC %channel"
+    //% weight=90
+    export function ADC(channel: AI): number {
+        let buf = pins.createBuffer(1);
+        buf[0] = 0x40 | channel;
+        pins.i2cWriteBuffer(PCF8591_ADDRESS, buf);
+        let res = pins.i2cReadNumber(PCF8591_ADDRESS, NumberFormat.UInt8LE, false);
+        res = pins.i2cReadNumber(PCF8591_ADDRESS, NumberFormat.UInt8LE, false);
+        return res;
+    }
+
+    //% blockID==Analog
+    //% block="Scan"
+    //% weight=90 advanced=true
+    export function ScanAllChannel(): number[] {
+        let buf = pins.createBuffer(1);
+        buf[0] = 0x44;
+        pins.i2cWriteBuffer(PCF8591_ADDRESS, buf);
+        pins.i2cReadNumber(PCF8591_ADDRESS, NumberFormat.UInt8LE, false);
+        let res = [-1, -1, -1, -1];
+        for (let i = 0; i < 4; i++) {
+            res[i] = pins.i2cReadNumber(PCF8591_ADDRESS, NumberFormat.UInt8LE, false);
+        }
+        for (let i = 0; i < 4; i++) {
+            serial.writeValue(i.toString(), res[i])
+        }
+        return res;
+    }
+}
+
+enum LEDS {
+    LED0 = 0,
+    LED1,
+    LED2,
+    LED3,
+}
+
+//// color=#5C2D91 weight=101 icon="\uf205"
+//% weight=20 color=#3333ff icon="\uf205"
+namespace ExtraLed {
+    let led_state:number[] = [0, 0, 0, 0];
+    //% blockId=ExtraLed block="LED|led %led ON"
+    //% weight=100
+    export function LED_ON(led: LEDS)
+    {
+        if(led <= 2)
+        {
+            Servo.SetLED(led, true)
+        }
+        else
+        {
+            Analog.DAC(255)
+        }
+        led_state[led] = 1;
+    }
+    //% blockId=ExtraLed block="LED|led %led OFF"
+    //% weight=100
+    export function LED_OFF(led: LEDS)
+    {
+        if (led <= 2) {
+            Servo.SetLED(led, false)
+        }
+        else {
+            Analog.DAC(0)
+        }
+        led_state[led] = 0;
+    }
+    //% blockId=ExtraLed block="LED|led %led TOGGLE"
+    //% weight=100
+    export function LED_TOGGLE(led: LEDS)
+    {
+        if(led_state[led])
+        {
+            LED_OFF(led)
+        }
+        else
+        {
+            LED_ON(led)
+        }
     }
 }

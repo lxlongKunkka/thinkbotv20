@@ -25,14 +25,23 @@ basic.forever(function() {
             DRAW_FILL.DRAW_EMPTY, 
             DOT_PIXEL.DOT_PIXEL_1)
     }
-    if (KeyPad.ReadKey(KEY.IN1)) {
-        LCD.DrawCircle(
-            randint(0, 160),
-            randint(0, 120),
-            2,
-            randint(0, 65535),
-            DRAW_FILL.DRAW_FULL,
-            DOT_PIXEL.DOT_PIXEL_1
-        )
+    if (KeyPad.ReadKey(KEY.UP)) {
+        Motor.forward(200, 100)
     }
+    if (KeyPad.ReadKey(KEY.DOWN)) {
+        Motor.back(200, 100)
+    }
+    if (KeyPad.ReadKey(KEY.LEFT)) {
+        Motor.left(200, 100)
+    }
+    if (KeyPad.ReadKey(KEY.RIGHT)) {
+        Motor.right(200, 100)
+    }
+})
+basic.forever(function() {
+    ExtraLed.LED_TOGGLE(LEDS.LED0)
+    ExtraLed.LED_TOGGLE(LEDS.LED1)
+    ExtraLed.LED_TOGGLE(LEDS.LED2)
+    ExtraLed.LED_TOGGLE(LEDS.LED3)
+    basic.pause(500)
 })
