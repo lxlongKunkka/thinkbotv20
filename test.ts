@@ -25,6 +25,49 @@ basic.forever(function() {
             DRAW_FILL.DRAW_EMPTY, 
             DOT_PIXEL.DOT_PIXEL_1)
     }
+    if (KeyPad.ReadKey(KEY.UBIT_A)) {
+        LCD.DrawCircle(
+            10,
+            10,
+            2,
+            63488,
+            DRAW_FILL.DRAW_FULL,
+            DOT_PIXEL.DOT_PIXEL_1
+        )
+    }
+    else
+    {
+        LCD.DrawCircle(
+            10,
+            10,
+            2,
+            33840,
+            DRAW_FILL.DRAW_FULL,
+            DOT_PIXEL.DOT_PIXEL_1
+        )
+    }
+
+    if (KeyPad.ReadKey(KEY.UBIT_B)) {
+        LCD.DrawCircle(
+            150,
+            10,
+            2,
+            63488,
+            DRAW_FILL.DRAW_FULL,
+            DOT_PIXEL.DOT_PIXEL_1
+        )
+    }
+    else {
+        LCD.DrawCircle(
+            150,
+            10,
+            2,
+            33840,
+            DRAW_FILL.DRAW_FULL,
+            DOT_PIXEL.DOT_PIXEL_1
+        )
+    }
+
     if (KeyPad.ReadKey(KEY.UP)) {
         Motor.forward(200, 100)
     }
