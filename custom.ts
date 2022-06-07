@@ -223,9 +223,9 @@ pins.spiPins(DigitalPin.P15, DigitalPin.P14, DigitalPin.P13)
 pins.spiFormat(8, 0)
 pins.spiFrequency(18000000)
 
-let LCD_RST = 0;    //DigitalPin.P16;
+let LCD_RST = 0;
 let LCD_DC = DigitalPin.P8;
-let LCD_CS = DigitalPin.P12;
+let LCD_CS = DigitalPin.P9;
 let LCD_BL = 7;
 
 //% weight=20 color=#436EEE icon="\uf108"
@@ -651,3 +651,59 @@ namespace LCD1IN8 {
         Point2 = Temp;
     }
 }
+
+let SR_CLK = DigitalPin.P16;
+let INSR0_DATA = DigitalPin.P12;        //Data
+let INSR_LATCH = 8;
+
+enum KEY {
+    IN1 = 0,
+    IN2 = 1,
+    IN3 = 2,
+    IN4 = 3,
+    LEFT = 8,
+    UP = 9,
+    DOWN = 10,
+    RIGHT = 11,
+    A = 12,
+    B = 13,
+    MENU = 14,
+};
+
+//% weight=20 color=#3333ff icon="\uf11b"
+namespace SimpleShieldKey {
+    let KEYSCAN = 0;
+    //% blockID==Listen_Key
+    //% block="Listen_Key"
+    //% weight=90
+    export function Read74HC165(): void {
+        pins.setPull(INSR0_DATA, PinPullMode.PullUp)
+        Servo.FullOff(INSR_LATCH);
+        control.waitMicros(20000);
+        Servo.FullOn(INSR_LATCH);
+        control.waitMicros(20000);
+        KEYSCAN = 0;
+        let i = 0;
+        for (i = 0; i < 16; i++) {
+            KEYSCAN = KEYSCAN << 1;
+            let tmp = pins.digitalReadPin(INSR0_DATA);
+            KEYSCAN |= tmp;
+            pins.digitalWritePin(SR_CLK, 0);
+            control.waitMicros(1000);
+            pins.digitalWritePin(SR_CLK, 1);
+        }
+        //basic.showNumber(KEYSCAN);
+    }
+
+    //% blockID==Listen_Key
+    //% block="Key %pin |Press"
+    //% weight=90
+    export function Listen_Key(pin: KEY): boolean {
+        let res = (KEYSCAN >> pin) & 0x01;
+        if (res == 1) {
+            return false;
+        }
+        return true;
+    }
+}
+
