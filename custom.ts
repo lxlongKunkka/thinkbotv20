@@ -814,8 +814,6 @@ namespace Motor {
     }
 }
 
-// Add your code here
-
 let PCF8591_ADDRESS = 72;
 
 enum AI {
@@ -828,7 +826,6 @@ enum AI {
 
 //% weight=20 color=#3333ff icon="\uf11b"
 namespace Analog {
-    let KEYSCAN = 0;
     //% blockID==Analog
     //% block="DAC %val"
     //% weight=90
